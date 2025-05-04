@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot</title>
+    <style>
+        #chatbox {
+            width: 400px;
+            height: 500px;
+            border: 1px solid #ddd;
+            padding: 10px;
+            overflow-y: scroll;
+        }
+        #chatbox div {
+            margin: 10px 0;
+        }
+        #chatbox .user {
+            text-align: right;
+        }
+        #chatbox .assistant {
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Chatbot</h2>
+<div id="chatbox"></div>
+
+<input type="text" id="userInput" placeholder="Type a message" />
+<button onclick="sendMessage()">Send</button>
+
+<script>
+    function sendMessage() {
+        const userInput = document.getElementById('userInput').value;
+        if (userInput.trim() === "") return;
+
+        const chatbox = document.getElementById('chatbox');
+        const userMessage = document.createElement('div');
+        userMessage.classList.add('user');
+        userMessage.textContent = userInput;
+        chatbox.appendChild(userMessage);
+        document.getElementById('userInput').value = "";
+
+        fetch('/chat', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ message: userInput })
+        })
+        .then(response => response.json())
+        .then(data => {
+            const assistantMessage = document.createElement('div');
+            assistantMessage.classList.add('assistant');
+            assistantMessage.textContent = data.reply;
+            chatbox.appendChild(assistantMessage);
+            chatbox.scrollTop = chatbox.scrollHeight;
+        });
+    }
+</script>
+
+</body>
+</html>
